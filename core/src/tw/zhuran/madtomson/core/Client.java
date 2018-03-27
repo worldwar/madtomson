@@ -1,11 +1,15 @@
 package tw.zhuran.madtomson.core;
 
-import tw.zhuran.madtom.domain.Action;
-import tw.zhuran.madtom.domain.Piece;
-import tw.zhuran.madtom.domain.Pieces;
-import tw.zhuran.madtom.domain.Trunk;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import tw.zhuran.madtom.domain.*;
 import tw.zhuran.madtom.event.Info;
+import tw.zhuran.madtom.server.Packets;
+import tw.zhuran.madtom.server.packet.InfoPacket;
+import tw.zhuran.madtom.server.packet.MadPacket;
 import tw.zhuran.madtom.util.F;
+import tw.zhuran.madtomson.P;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +24,50 @@ public class Client {
     private Map<Integer, Trunk> trunks;
     private ClientState clientState;
     private Info info;
+    private Connector connector;
 
     public Client() {
         clientState = ClientState.INIT;
         trunks = new HashMap<Integer, Trunk>();
+        connector = new Connector();
+        connector.setClient(this);
+    }
+
+    public void start() {
+        try {
+            connector.connect("localhost", 32211);
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public void ready() {
+        connector.send(Packets.ready());
+    }
+
+    public void draw(SpriteBatch batch) {
+        batch.disableBlending();
+        drawHand(batch);
+        batch.enableBlending();
+    }
+
+    private void drawHand(SpriteBatch batch) {
+        if (info != null) {
+            List<Piece> pieces = info.getPieces();
+            int index = 0;
+            for (Piece piece : pieces) {
+                drawHandPiece(batch, piece, index);
+                index++;
+            }
+        }
+    }
+
+    private void drawHandPiece(SpriteBatch batch, Piece piece, int index) {
+        Sprite sprite = P.sprite(piece);
+        float scale = 0.7f;
+        sprite.setPosition(sprite.getWidth() * index * scale, 0);
+        sprite.setColor(Color.WHITE);
+        sprite.setScale(scale);
+        sprite.draw(batch);
     }
 
     public void init(Info info) {
@@ -49,6 +93,7 @@ public class Client {
         } else {
             this.clientState = ClientState.FREE;
         }
+        this.info = info;
     }
 
     private Trunk makeTrunk(int player, int handCount, List<Action> actions) {
@@ -73,5 +118,14 @@ public class Client {
 
     public void setInfo(Info info) {
         this.info = info;
+    }
+
+    public void handle(MadPacket packet) {
+        switch (packet.getType()) {
+            case INFO:
+                InfoPacket infoPacket = (InfoPacket) packet;
+                Info info = infoPacket.getContent();
+                init(info);
+        }
     }
 }
