@@ -4,11 +4,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.github.underscore.$;
+import com.github.underscore.Predicate;
 import tw.zhuran.madtom.domain.*;
-import tw.zhuran.madtom.event.Event;
-import tw.zhuran.madtom.event.Events;
-import tw.zhuran.madtom.event.Info;
+import tw.zhuran.madtom.event.*;
+import tw.zhuran.madtom.server.EventPacket;
 import tw.zhuran.madtom.server.Packets;
+import tw.zhuran.madtom.server.packet.DispatchEventPacket;
+import tw.zhuran.madtom.server.packet.GangAffordEventPacket;
 import tw.zhuran.madtom.server.packet.InfoPacket;
 import tw.zhuran.madtom.server.packet.MadPacket;
 import tw.zhuran.madtom.util.F;
@@ -32,6 +35,8 @@ public class Client {
     private Connector connector;
     private Stage stage;
     private List<PieceActor> handActors;
+    private Piece feedPiece;
+    private PieceActor feedPieceActor;
 
     public Client() {
         clientState = ClientState.INIT;
@@ -64,9 +69,13 @@ public class Client {
 
     public void tryDiscard(PieceActor pieceActor) {
         if (clientState == ClientState.ACTIVE) {
-            Piece piece = pieceActor.getPiece();
+            final Piece piece = pieceActor.getPiece();
             if (info.getPieces().contains(piece)) {
                 discard(piece);
+                if (piece != feedPiece) {
+                    handActors.remove(pieceActor.getIndex());
+                    insertIntoHand();
+                }
                 pieceActor.remove();
             }
         }
@@ -74,6 +83,8 @@ public class Client {
 
     public void discard(Piece piece) {
         List<Piece> pieces = info.getPieces();
+        Trunk trunk = trunks.get(self);
+        trunk.discard(piece);
         pieces.remove(piece);
         Event action = Events.action(self, Actions.discard(piece));
         connector.send(Packets.event(action, self));
@@ -167,7 +178,93 @@ public class Client {
                 InfoPacket infoPacket = (InfoPacket) packet;
                 Info info = infoPacket.getContent();
                 init(info);
+                break;
+            case EVENT:
+                if (packet instanceof DispatchEventPacket) {
+                    DispatchEventPacket dispatchEventPacket = (DispatchEventPacket) packet;
+                    DispatchEvent content = dispatchEventPacket.getContent();
+                    handDispatch(content);
+                    return;
+                }
+
+                if (packet instanceof GangAffordEventPacket) {
+                    GangAffordEventPacket gangAffordEventPacket = (GangAffordEventPacket) packet;
+                    GangAffordEvent content = gangAffordEventPacket.getContent();
+                    handGangAfford(content);
+                    return;
+                }
+
+                EventPacket eventPacket = (EventPacket) packet;
+                Event content = eventPacket.getContent();
+                handleEvent(content);
+                EventType eventType = content.getEventType();
+                if (eventType == EventType.ACTION) {
+                    handleAction(content);
+                }
         }
+    }
+
+    private void handGangAfford(GangAffordEvent event) {
+        if (event.getPlayer() == self) {
+            feed(event.getPiece());
+        }
+    }
+
+    private void handDispatch(DispatchEvent event) {
+        if (event.getPlayer() == self) {
+            clientState = ClientState.ACTIVE;
+            feed(event.getPiece());
+        }
+    }
+
+    private void handleAction(Event event) {
+
+    }
+
+    private void handleEvent(Event event) {
+        EventType eventType = event.getEventType();
+        switch (eventType) {
+            case DISPATCH:
+                DispatchEvent dispatchEvent = (DispatchEvent) event;
+                if (self == event.getPlayer()) {
+                }
+        }
+    }
+
+    private void feed(Piece piece) {
+        this.feedPiece = piece;
+        feedPieceActor = new PieceActor(this, piece, 14);
+        stage.addActor(feedPieceActor);
+    }
+
+    public void insertIntoHand() {
+        if (feedPiece != null) {
+            int i = insertLocation(feedPiece);
+            handActors.add(i, feedPieceActor);
+            feedPiece = null;
+            feedPieceActor = null;
+        }
+        arrange();
+    }
+
+    private void arrange() {
+        for (int i = 0; i < handActors.size(); i++) {
+            handActors.get(i).setIndex(i);
+        }
+    }
+
+    private int insertLocation(final Piece piece) {
+        Trunk trunk = trunks.get(self);
+        trunk.feed(piece);
+        Hand hand = trunk.getHand();
+        List<Piece> pieces = hand.all();
+        int index = $.findIndex(pieces, new Predicate<Piece>() {
+            @Override
+            public Boolean apply(Piece p) {
+                return p.equals(piece);
+            }
+        });
+        return index;
     }
 
     public void setStage(Stage stage) {

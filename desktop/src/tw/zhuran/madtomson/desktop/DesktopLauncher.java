@@ -7,7 +7,7 @@ import tw.zhuran.madtomson.MadGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 1000;
+		config.width = 1100;
 		config.height = 750;
 		new LwjglApplication(new MadGame(), config);
 	}
