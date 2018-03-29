@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class P {
-    public static Texture PIECES_TEXTURE = new Texture("mahjong.png");
+    public static Texture PIECES_TEXTURE;
     public static Map<Piece, Sprite> PIECES = new HashMap<Piece, Sprite>();
 
     public static int TOP = 0;
@@ -21,7 +21,8 @@ public class P {
     public static int PIECE_WIDTH = 100;
     public static int PIECE_HEIGHT = 125;
 
-    static {
+    public static void init() {
+        PIECES_TEXTURE = new Texture("mahjong.png");
         $.each(Pieces.ALL, new Block<Piece>() {
             @Override
             public void apply(Piece x) {
