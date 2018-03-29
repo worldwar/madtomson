@@ -54,5 +54,6 @@ public class PieceActor extends Actor {
 
     public void setIndex(int index) {
         this.index = index;
+        setBounds(sprite.getWidth() * index * scale, 0, sprite.getWidth(), sprite.getHeight());
     }
 }

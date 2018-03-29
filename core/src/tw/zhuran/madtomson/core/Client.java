@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.underscore.$;
 import com.github.underscore.Predicate;
+import com.badlogic.gdx.math.Affine2;
 import tw.zhuran.madtom.domain.*;
 import tw.zhuran.madtom.event.*;
 import tw.zhuran.madtom.server.EventPacket;
@@ -15,6 +16,7 @@ import tw.zhuran.madtom.server.packet.GangAffordEventPacket;
 import tw.zhuran.madtom.server.packet.InfoPacket;
 import tw.zhuran.madtom.server.packet.MadPacket;
 import tw.zhuran.madtom.util.F;
+import tw.zhuran.madtom.util.ReverseNaturalTurner;
 import tw.zhuran.madtomson.P;
 import tw.zhuran.madtomson.core.actor.PieceActor;
 
@@ -59,7 +61,11 @@ public class Client {
 
     public void draw(SpriteBatch batch) {
         batch.disableBlending();
-        drawHand(batch);
+        drawLeft(batch);
+        if (info != null) {
+            drawHand(batch);
+            drawLeft(batch);
+        }
         batch.enableBlending();
     }
 
@@ -67,16 +73,22 @@ public class Client {
         stage.draw();
     }
 
-    public void tryDiscard(PieceActor pieceActor) {
+    public void tryDiscard(final PieceActor pieceActor) {
         if (clientState == ClientState.ACTIVE) {
             final Piece piece = pieceActor.getPiece();
-            if (info.getPieces().contains(piece)) {
+            if (trunks.get(self).getHand().all().contains(piece)) {
                 discard(piece);
-                if (piece != feedPiece) {
-                    handActors.remove(pieceActor.getIndex());
-                    insertIntoHand();
-                }
+                int index = $.findIndex(handActors, new Predicate<PieceActor>() {
+                    @Override
+                    public Boolean apply(PieceActor arg) {
+                        return pieceActor.getIndex() == arg.getIndex();
+                    }
+                });
+                handActors.remove(index);
+                feedPiece = null;
+                feedPieceActor = null;
                 pieceActor.remove();
+                arrange();
             }
         }
     }
@@ -88,6 +100,26 @@ public class Client {
         pieces.remove(piece);
         Event action = Events.action(self, Actions.discard(piece));
         connector.send(Packets.event(action, self));
+    }
+
+    private void drawLeft(SpriteBatch batch) {
+        for (int i = 0; i < 14; i++) {
+            drawLeftHand(batch, i);
+        }
+    }
+
+    private void drawLeftHand(SpriteBatch batch, int i) {
+        Affine2 transform = new Affine2();
+        transform.translate(100 + i * 350 * 0.015f, i * 250 * 0.12f + 200);
+        transform.shear(-0.3f, 5.0f);
+        transform.scale(0.015f, 0.1f);
+        batch.draw(P.BACK_REGION, 325, 400, transform);
+    }
+
+    private int left() {
+        ReverseNaturalTurner turner = new ReverseNaturalTurner(4);
+        turner.turnTo(self);
+        return turner.next();
     }
 
     private void drawHand(SpriteBatch batch) {
@@ -158,9 +190,11 @@ public class Client {
 
     private Trunk makeTrunk(List<Piece> pieces, List<Action> actions) {
         Trunk trunk = new Trunk(self);
-        trunk.init(pieces);
         trunk.setWildcard(wildcard);
         trunk.setActions(actions);
+        for (Piece piece : pieces) {
+            trunk.feed(piece);
+        }
         return trunk;
     }
 
@@ -235,6 +269,9 @@ public class Client {
         this.feedPiece = piece;
         feedPieceActor = new PieceActor(this, piece, 14);
         stage.addActor(feedPieceActor);
+
+        int i = insertLocation(feedPiece);
+        handActors.add(i, feedPieceActor);
     }
 
     public void insertIntoHand() {
@@ -264,6 +301,7 @@ public class Client {
                 return p.equals(piece);
             }
         });
+        info.getPieces().add(index, piece);
         return index;
     }
 
