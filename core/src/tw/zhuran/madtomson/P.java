@@ -1,6 +1,7 @@
 package tw.zhuran.madtomson;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.github.underscore.$;
@@ -16,6 +17,7 @@ public class P {
     public static Texture BACK_TEXTURE;
     public static Map<Piece, Sprite> PIECES = new HashMap<Piece, Sprite>();
     public static TextureRegion BACK_REGION;
+    public static BitmapFont BITMAP_FONT;
 
     public static int TOP = 0;
     public static int LEFT = 0;
@@ -27,6 +29,7 @@ public class P {
     public static void init() {
         PIECES_TEXTURE = new Texture("mahjong.png");
         BACK_TEXTURE = new Texture("back.jpg");
+        BITMAP_FONT = new BitmapFont();
         BACK_REGION = makeBack();
         $.each(Pieces.ALL, new Block<Piece>() {
             @Override

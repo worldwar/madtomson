@@ -1,5 +1,6 @@
 package tw.zhuran.madtomson.core;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,13 +12,11 @@ import tw.zhuran.madtom.domain.*;
 import tw.zhuran.madtom.event.*;
 import tw.zhuran.madtom.server.EventPacket;
 import tw.zhuran.madtom.server.Packets;
-import tw.zhuran.madtom.server.packet.DispatchEventPacket;
-import tw.zhuran.madtom.server.packet.GangAffordEventPacket;
-import tw.zhuran.madtom.server.packet.InfoPacket;
-import tw.zhuran.madtom.server.packet.MadPacket;
+import tw.zhuran.madtom.server.packet.*;
 import tw.zhuran.madtom.util.F;
 import tw.zhuran.madtom.util.ReverseNaturalTurner;
 import tw.zhuran.madtomson.P;
+import tw.zhuran.madtomson.core.actor.InterceptGroup;
 import tw.zhuran.madtomson.core.actor.PieceActor;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ public class Client {
     private List<PieceActor> handActors;
     private Piece feedPiece;
     private PieceActor feedPieceActor;
+    private InterceptGroup interceptGroup;
 
     public Client() {
         clientState = ClientState.INIT;
@@ -46,6 +46,10 @@ public class Client {
         connector = new Connector();
         connector.setClient(this);
         handActors = new ArrayList<>();
+        stage = new Stage();
+        Gdx.input.setInputProcessor(stage);
+        interceptGroup = new InterceptGroup(this);
+        stage.addActor(interceptGroup);
     }
 
     public void start() {
@@ -228,6 +232,13 @@ public class Client {
                     return;
                 }
 
+                if (packet instanceof InterceptPacket) {
+                    InterceptPacket interceptPacket = (InterceptPacket) packet;
+                    InterceptEvent content = interceptPacket.getContent();
+                    interceptGroup.intercept(piece, TriggerType.CAPTURE, content);
+                    return;
+                }
+
                 EventPacket eventPacket = (EventPacket) packet;
                 Event content = eventPacket.getContent();
                 handleEvent(content);
@@ -252,7 +263,8 @@ public class Client {
     }
 
     private void handleAction(Event event) {
-
+        Action action = event.getAction();
+        piece = action.getPiece();
     }
 
     private void handleEvent(Event event) {
@@ -307,5 +319,17 @@ public class Client {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public void pass() {
+        connector.send(Packets.event(Events.pass(self), 0));
+    }
+
+    public Trunk trunk() {
+        return trunks.get(self);
+    }
+
+    public Hand hand() {
+        return trunk().getHand();
     }
 }

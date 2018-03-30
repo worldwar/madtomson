@@ -4,24 +4,20 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import tw.zhuran.madtomson.core.Client;
 
 public class MadGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Client client;
-	private Stage stage;
-	
+
 	@Override
 	public void create () {
-		stage = new Stage();
+		P.init();
+
 		batch = new SpriteBatch();
 		client = new Client();
 		client.start();
 		client.ready();
-		Gdx.input.setInputProcessor(stage);
-		client.setStage(stage);
-		P.init();
 	}
 
 	@Override
