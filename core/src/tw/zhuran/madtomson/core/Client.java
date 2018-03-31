@@ -89,6 +89,7 @@ public class Client {
         Trunk trunk = trunks.get(self);
         trunk.discard(piece);
         pieces.remove(piece);
+        clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.discard(piece));
         connector.send(Packets.event(action, self));
     }
