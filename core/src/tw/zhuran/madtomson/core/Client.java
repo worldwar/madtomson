@@ -5,9 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.github.underscore.$;
-import com.github.underscore.Optional;
-import com.github.underscore.Predicate;
 import com.badlogic.gdx.math.Affine2;
 import tw.zhuran.madtom.domain.*;
 import tw.zhuran.madtom.event.*;
@@ -17,10 +14,10 @@ import tw.zhuran.madtom.server.packet.*;
 import tw.zhuran.madtom.util.F;
 import tw.zhuran.madtom.util.ReverseNaturalTurner;
 import tw.zhuran.madtomson.P;
+import tw.zhuran.madtomson.core.actor.HandActor;
 import tw.zhuran.madtomson.core.actor.InterceptGroup;
 import tw.zhuran.madtomson.core.actor.PieceActor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +33,7 @@ public class Client {
     private Info info;
     private Connector connector;
     private Stage stage;
-    private List<PieceActor> handActors;
-    private Piece feedPiece;
-    private PieceActor feedPieceActor;
+    private HandActor handActor;
     private InterceptGroup interceptGroup;
 
     public Client() {
@@ -46,11 +41,12 @@ public class Client {
         trunks = new HashMap<Integer, Trunk>();
         connector = new Connector();
         connector.setClient(this);
-        handActors = new ArrayList<>();
+        handActor = new HandActor(this);
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         interceptGroup = new InterceptGroup(this);
         stage.addActor(interceptGroup);
+        stage.addActor(handActor);
     }
 
     public void start() {
@@ -82,18 +78,8 @@ public class Client {
         if (clientState == ClientState.ACTIVE) {
             final Piece piece = pieceActor.getPiece();
             if (trunks.get(self).getHand().all().contains(piece)) {
+                handActor.remove(piece);
                 discard(piece);
-                int index = $.findIndex(handActors, new Predicate<PieceActor>() {
-                    @Override
-                    public Boolean apply(PieceActor arg) {
-                        return pieceActor.getIndex() == arg.getIndex();
-                    }
-                });
-                handActors.remove(index);
-                feedPiece = null;
-                feedPieceActor = null;
-                pieceActor.remove();
-                arrange();
             }
         }
     }
@@ -181,13 +167,7 @@ public class Client {
     }
 
     private void initActors() {
-        int i = 0;
-        for (Piece piece : info.getPieces()) {
-            PieceActor pieceActor = new PieceActor(this, piece, i);
-            handActors.add(pieceActor);
-            stage.addActor(pieceActor);
-            i++;
-        }
+        handActor.init();
     }
 
     private Trunk makeTrunk(int player, int handCount, List<Action> actions) {
@@ -268,25 +248,6 @@ public class Client {
         }
     }
 
-    private PieceActor findPieceActor(final Piece piece) {
-        Optional<PieceActor> pieceActorOptional = $.find(handActors, new Predicate<PieceActor>() {
-            @Override
-            public Boolean apply(PieceActor arg) {
-                return arg.getPiece().equals(piece);
-            }
-        });
-        return pieceActorOptional.orNull();
-    }
-
-    private void removeFromHandActor(final Piece piece) {
-        PieceActor pieceActor = findPieceActor(piece);
-        if (pieceActor != null) {
-            handActors.remove(pieceActor);
-            pieceActor.remove();
-        }
-        arrange();
-    }
-
     private void handleAction(Event event) {
         Action action = event.getAction();
         piece = action.getPiece();
@@ -307,11 +268,9 @@ public class Client {
         Action action = event.getAction();
         switch (action.getType()) {
             case CHI:
-                List<Piece> partners = action.getGroup().partners(action.getPiece());
-                for (Piece piece : partners) {
-                    removeFromHandActor(piece);
-                }
+                handActor.performAction(action);
                 trunk.chi(action.getPiece(), action.getGroup());
+                clientState = ClientState.ACTIVE;
         }
     }
 
@@ -326,43 +285,8 @@ public class Client {
     }
 
     private void feed(Piece piece) {
-        this.feedPiece = piece;
-        feedPieceActor = new PieceActor(this, piece, 14);
-        stage.addActor(feedPieceActor);
-
-        int i = insertLocation(feedPiece);
-        handActors.add(i, feedPieceActor);
-    }
-
-    public void insertIntoHand() {
-        if (feedPiece != null) {
-            int i = insertLocation(feedPiece);
-            handActors.add(i, feedPieceActor);
-            feedPiece = null;
-            feedPieceActor = null;
-        }
-        arrange();
-    }
-
-    private void arrange() {
-        for (int i = 0; i < handActors.size(); i++) {
-            handActors.get(i).setIndex(i);
-        }
-    }
-
-    private int insertLocation(final Piece piece) {
-        Trunk trunk = trunks.get(self);
-        trunk.feed(piece);
-        Hand hand = trunk.getHand();
-        List<Piece> pieces = hand.all();
-        int index = $.findIndex(pieces, new Predicate<Piece>() {
-            @Override
-            public Boolean apply(Piece p) {
-                return p.equals(piece);
-            }
-        });
-        info.getPieces().add(index, piece);
-        return index;
+        trunk().feed(piece);
+        handActor.feed(piece);
     }
 
     public void setStage(Stage stage) {
