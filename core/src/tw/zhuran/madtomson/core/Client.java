@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.underscore.$;
+import com.github.underscore.Optional;
 import com.github.underscore.Predicate;
 import com.badlogic.gdx.math.Affine2;
 import tw.zhuran.madtom.domain.*;
@@ -103,6 +104,11 @@ public class Client {
         trunk.discard(piece);
         pieces.remove(piece);
         Event action = Events.action(self, Actions.discard(piece));
+        connector.send(Packets.event(action, self));
+    }
+
+    public void sendChi(Piece piece, Group group) {
+        Event action = Events.action(self, Actions.chi(piece, group));
         connector.send(Packets.event(action, self));
     }
 
@@ -262,9 +268,51 @@ public class Client {
         }
     }
 
+    private PieceActor findPieceActor(final Piece piece) {
+        Optional<PieceActor> pieceActorOptional = $.find(handActors, new Predicate<PieceActor>() {
+            @Override
+            public Boolean apply(PieceActor arg) {
+                return arg.getPiece().equals(piece);
+            }
+        });
+        return pieceActorOptional.orNull();
+    }
+
+    private void removeFromHandActor(final Piece piece) {
+        PieceActor pieceActor = findPieceActor(piece);
+        if (pieceActor != null) {
+            handActors.remove(pieceActor);
+            pieceActor.remove();
+        }
+        arrange();
+    }
+
     private void handleAction(Event event) {
         Action action = event.getAction();
         piece = action.getPiece();
+
+        if (event.getPlayer() == self) {
+            handleSelfAction(event);
+        } else {
+            handOtherAction(event);
+        }
+    }
+
+    private void handOtherAction(Event event) {
+
+    }
+
+    private void handleSelfAction(Event event) {
+        Trunk trunk = trunk();
+        Action action = event.getAction();
+        switch (action.getType()) {
+            case CHI:
+                List<Piece> partners = action.getGroup().partners(action.getPiece());
+                for (Piece piece : partners) {
+                    removeFromHandActor(piece);
+                }
+                trunk.chi(action.getPiece(), action.getGroup());
+        }
     }
 
     private void handleEvent(Event event) {

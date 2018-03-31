@@ -7,6 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import tw.zhuran.madtomson.P;
 import tw.zhuran.madtomson.core.Client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ActionActor extends Actor {
     protected Client client;
     protected TextButton textButton;
@@ -24,5 +27,14 @@ public class ActionActor extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         textButton.setBounds(getX(), getY(), getWidth(), getHeight());
         textButton.draw(batch, parentAlpha);
+        for (Actor actor : children()) {
+            if (actor.isVisible()) {
+                actor.draw(batch, parentAlpha);
+            }
+        }
+    }
+
+    protected List<Actor> children() {
+        return new ArrayList<Actor>();
     }
 }
