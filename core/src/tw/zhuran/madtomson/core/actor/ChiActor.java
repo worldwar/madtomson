@@ -18,7 +18,6 @@ public class ChiActor extends ActionActor {
 
     public ChiActor(final Client client, final Piece piece, final List<Group> groups) {
         super(client, "Chi");
-        setBounds(50, 200, 50, 20);
         this.piece = piece;
         this.groups = groups;
         initOptions();

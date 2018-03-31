@@ -13,15 +13,12 @@ import java.util.List;
 
 public class GroupActor extends Actor {
     private Action action;
-    private int index;
     private List<Sprite> sprites;
     private Sprite sprite;
     private float scale = 0.6f;
 
-
-    public GroupActor(Action action) {
+    public GroupActor(Action action, int index) {
         this.action = action;
-        this.index = index;
         sprites = new ArrayList<>(3);
         for (Piece piece : action.getGroup().getPieces()) {
             Sprite sprite = P.sprite(piece);
@@ -34,7 +31,7 @@ public class GroupActor extends Actor {
 
         setWidth(sprite.getWidth() * 3 * scale);
         setHeight(sprite.getHeight() * scale);
-        setX(getWidth() * index);
+        setX((getWidth() + 20) * index);
         setRotation(15);
     }
 

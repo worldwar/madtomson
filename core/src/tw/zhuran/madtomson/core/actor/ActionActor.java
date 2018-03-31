@@ -13,6 +13,7 @@ import java.util.List;
 public class ActionActor extends Actor {
     protected Client client;
     protected TextButton textButton;
+    protected int index;
 
     public ActionActor(Client client, String text) {
         this.client = client;
@@ -21,6 +22,8 @@ public class ActionActor extends Actor {
         textButtonStyle.fontColor = Color.BLACK;
         textButton = new TextButton(text, textButtonStyle);
         textButton.scaleBy(1.5f);
+        setWidth(50);
+        setHeight(20);
     }
 
     @Override
@@ -36,5 +39,10 @@ public class ActionActor extends Actor {
 
     protected List<Actor> children() {
         return new ArrayList<Actor>();
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+        setBounds(getParent().getX() + getWidth() * index, getParent().getY(), getWidth(), getHeight());
     }
 }

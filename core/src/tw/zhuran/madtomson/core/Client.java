@@ -98,6 +98,11 @@ public class Client {
         connector.send(Packets.event(action, self));
     }
 
+    public void sendPeng(Piece piece) {
+        Event action = Events.action(self, Actions.peng(piece));
+        connector.send(Packets.event(action, self));
+    }
+
     private void drawLeft(SpriteBatch batch) {
         for (int i = 0; i < 14; i++) {
             drawLeftHand(batch, i);
@@ -270,6 +275,11 @@ public class Client {
             case CHI:
                 handActor.performAction(action);
                 trunk.chi(action.getPiece(), action.getGroup());
+                clientState = ClientState.ACTIVE;
+                break;
+            case PENG:
+                handActor.performAction(action);
+                trunk.peng(action.getPiece());
                 clientState = ClientState.ACTIVE;
         }
     }
