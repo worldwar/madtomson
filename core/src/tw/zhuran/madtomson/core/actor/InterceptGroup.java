@@ -17,19 +17,27 @@ public class InterceptGroup extends Group {
     private Hand hand;
     private Client client;
     private PassActor passActor;
+    private ChiActor chiActor;
+    private PengActor pengActor;
     private List<ActionActor> actors;
 
     public InterceptGroup(Client client) {
         setVisible(false);
+        setX(50);
+        setY(120);
         this.client = client;
         passActor = new PassActor(client);
+        chiActor = new ChiActor(client);
+        pengActor = new PengActor(client);
+
+        addActor(pengActor);
+        addActor(chiActor);
+        addActor(passActor);
         actors = new ArrayList<>();
-        setX(50);
-        setY(100);
     }
 
     public void intercept(Piece piece, TriggerType triggerType, InterceptEvent event) {
-        clearChildren();
+        hideActors();
         actors.clear();
         List<InterceptType> intercepts = event.getIntercepts();
         for (InterceptType interceptType : intercepts) {
@@ -37,10 +45,11 @@ public class InterceptGroup extends Group {
             } else if (interceptType == InterceptType.CHI) {
                 List<tw.zhuran.madtom.domain.Group> groups = client.hand().chiableSequences(piece);
                 if (groups.size() != 0) {
-                    actors.add(new ChiActor(client, piece, groups));
+                    chiActor.initOptions(piece, groups);
+                    actors.add(chiActor);
                 }
             } else if (interceptType == InterceptType.PENG) {
-                actors.add(new PengActor(client, piece));
+                actors.add(pengActor);
             } else if (interceptType == InterceptType.GANG) {
             }
         }
@@ -49,9 +58,15 @@ public class InterceptGroup extends Group {
 
         for (int i = 0; i < actors.size(); i++) {
             ActionActor actor = actors.get(i);
-            addActor(actor);
             actor.setIndex(i);
+            actor.setVisible(true);
         }
         setVisible(true);
+    }
+
+    private void hideActors() {
+        chiActor.setVisible(false);
+        pengActor.setVisible(false);
+        passActor.setVisible(false);
     }
 }

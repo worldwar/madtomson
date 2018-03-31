@@ -30,11 +30,6 @@ public class ActionActor extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         textButton.setBounds(getX(), getY(), getWidth(), getHeight());
         textButton.draw(batch, parentAlpha);
-        for (Actor actor : children()) {
-            if (actor.isVisible()) {
-                actor.draw(batch, parentAlpha);
-            }
-        }
     }
 
     protected List<Actor> children() {
@@ -43,6 +38,6 @@ public class ActionActor extends Actor {
 
     public void setIndex(int index) {
         this.index = index;
-        setBounds(getParent().getX() + getWidth() * index, getParent().getY(), getWidth(), getHeight());
+        setBounds(getParent().getX() + getWidth() * index, 0, getWidth(), getHeight());
     }
 }

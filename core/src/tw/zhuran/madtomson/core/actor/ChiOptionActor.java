@@ -36,8 +36,8 @@ public class ChiOptionActor extends Actor {
 
         setWidth(sprite.getWidth() * 3 * scale);
         setHeight(sprite.getHeight() * scale);
-        setX(getWidth() * index);
-        setY(parent.getY() + 50);
+        setX((getWidth() + 20) * index);
+        setY((sprite.getHeight() - sprite.getHeight() * scale) / 2);
 
         addListener(new InputListener() {
             @Override
@@ -54,8 +54,9 @@ public class ChiOptionActor extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         int i = 0;
         for (Sprite sprite : sprites) {
-            sprite.setPosition(getX() + sprite.getWidth() * scale * i, getY());
+            sprite.setBounds(getX() + sprite.getWidth() * scale * i, 0, sprite.getWidth(), sprite.getHeight());
             sprite.setScale(scale);
+            sprite.setRotation(0);
             sprite.draw(batch, parentAlpha);
             i++;
         }

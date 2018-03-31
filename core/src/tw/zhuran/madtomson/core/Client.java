@@ -99,7 +99,7 @@ public class Client {
         connector.send(Packets.event(action, self));
     }
 
-    public void sendPeng(Piece piece) {
+    public void sendPeng() {
         Event action = Events.action(self, Actions.peng(piece));
         connector.send(Packets.event(action, self));
     }
