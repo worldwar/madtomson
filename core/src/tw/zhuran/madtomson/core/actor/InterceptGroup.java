@@ -19,6 +19,7 @@ public class InterceptGroup extends Group {
     private PassActor passActor;
     private ChiActor chiActor;
     private PengActor pengActor;
+    private GangActor gangActor;
     private List<ActionActor> actors;
 
     public InterceptGroup(Client client) {
@@ -29,7 +30,9 @@ public class InterceptGroup extends Group {
         passActor = new PassActor(client);
         chiActor = new ChiActor(client);
         pengActor = new PengActor(client);
+        gangActor = new GangActor(client);
 
+        addActor(gangActor);
         addActor(pengActor);
         addActor(chiActor);
         addActor(passActor);
@@ -51,6 +54,7 @@ public class InterceptGroup extends Group {
             } else if (interceptType == InterceptType.PENG) {
                 actors.add(pengActor);
             } else if (interceptType == InterceptType.GANG) {
+                actors.add(gangActor);
             }
         }
 
@@ -65,6 +69,7 @@ public class InterceptGroup extends Group {
     }
 
     private void hideActors() {
+        gangActor.setVisible(false);
         chiActor.setVisible(false);
         pengActor.setVisible(false);
         passActor.setVisible(false);
