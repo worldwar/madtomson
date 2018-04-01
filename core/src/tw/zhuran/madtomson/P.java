@@ -15,7 +15,9 @@ import java.util.Map;
 public class P {
     public static Texture PIECES_TEXTURE;
     public static Texture BACK_TEXTURE;
+    public static Texture ACTIONS_TEXTURE;
     public static Map<Piece, Sprite> PIECES = new HashMap<Piece, Sprite>();
+    public static Map<String, Sprite> ACTION_SPRITES = new HashMap<String, Sprite>();
     public static TextureRegion BACK_REGION;
     public static BitmapFont BITMAP_FONT;
 
@@ -25,10 +27,13 @@ public class P {
     public static int COL_MARGIN = 0;
     public static int PIECE_WIDTH = 100;
     public static int PIECE_HEIGHT = 140;
+    public static int ACTION_WIDTH = 300;
+    public static int ACTION_HEIGHT = 280;
 
     public static void init() {
         PIECES_TEXTURE = new Texture("mahjong.png");
         BACK_TEXTURE = new Texture("back.jpg");
+        ACTIONS_TEXTURE = new Texture("actions.png");
         BITMAP_FONT = new BitmapFont();
         BACK_REGION = makeBack();
         $.each(Pieces.ALL, new Block<Piece>() {
@@ -37,6 +42,12 @@ public class P {
                 PIECES.put(x, makePiece(x));
             }
         });
+
+        ACTION_SPRITES.put("chi", makeAction(0));
+        ACTION_SPRITES.put("peng", makeAction(1));
+        ACTION_SPRITES.put("gang", makeAction(2));
+        ACTION_SPRITES.put("win", makeAction(3));
+        ACTION_SPRITES.put("pass", makeAction(4));
     }
 
     public static Sprite makeBack() {
@@ -57,7 +68,36 @@ public class P {
         return sprite;
     }
 
+    public static Sprite makeAction(int index) {
+        return new Sprite(ACTIONS_TEXTURE, index * ACTION_WIDTH, 0, ACTION_WIDTH, ACTION_HEIGHT);
+    }
+
     public static Sprite sprite(Piece piece) {
         return PIECES.get(piece);
+    }
+
+
+    public static Sprite action(String action) {
+        return ACTION_SPRITES.get(action);
+    }
+
+    public static Sprite chi() {
+        return ACTION_SPRITES.get("chi");
+    }
+
+    public static Sprite peng() {
+        return ACTION_SPRITES.get("peng");
+    }
+
+    public static Sprite gang() {
+        return ACTION_SPRITES.get("gang");
+    }
+
+    public static Sprite win() {
+        return ACTION_SPRITES.get("win");
+    }
+
+    public static Sprite pass() {
+        return ACTION_SPRITES.get("pass");
     }
 }

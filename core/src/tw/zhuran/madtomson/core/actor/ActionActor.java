@@ -1,9 +1,8 @@
 package tw.zhuran.madtomson.core.actor;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import tw.zhuran.madtomson.P;
 import tw.zhuran.madtomson.core.Client;
 
@@ -12,24 +11,26 @@ import java.util.List;
 
 public class ActionActor extends Actor {
     protected Client client;
-    protected TextButton textButton;
+    protected Sprite sprite;
     protected int index;
+    protected float scale;
 
     public ActionActor(Client client, String text) {
         this.client = client;
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = P.BITMAP_FONT;
-        textButtonStyle.fontColor = Color.BLACK;
-        textButton = new TextButton(text, textButtonStyle);
-        textButton.scaleBy(1.5f);
-        setWidth(50);
-        setHeight(20);
+
+        scale = 0.3f;
+        sprite = P.action(text.toLowerCase());
+        setWidth(P.ACTION_WIDTH * scale);
+        setHeight(P.ACTION_HEIGHT * scale);
+        setY(20);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        textButton.setBounds(getX(), getY(), getWidth(), getHeight());
-        textButton.draw(batch, parentAlpha);
+        sprite.setOrigin(0, 0);
+        sprite.setPosition(getX(), getY());
+        sprite.setScale(scale);
+        sprite.draw(batch);
     }
 
     protected List<Actor> children() {
@@ -38,6 +39,6 @@ public class ActionActor extends Actor {
 
     public void setIndex(int index) {
         this.index = index;
-        setBounds(getParent().getX() + getWidth() * index, 0, getWidth(), getHeight());
+        setX(getParent().getX() + getWidth() * index);
     }
 }
