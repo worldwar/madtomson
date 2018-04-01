@@ -24,7 +24,7 @@ public class P {
     public static int ROW_MARGIN = 0;
     public static int COL_MARGIN = 0;
     public static int PIECE_WIDTH = 100;
-    public static int PIECE_HEIGHT = 125;
+    public static int PIECE_HEIGHT = 140;
 
     public static void init() {
         PIECES_TEXTURE = new Texture("mahjong.png");
