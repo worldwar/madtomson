@@ -7,6 +7,7 @@ import tw.zhuran.madtom.domain.TriggerType;
 import tw.zhuran.madtom.event.InterceptEvent;
 import tw.zhuran.madtom.event.InterceptType;
 import tw.zhuran.madtomson.core.Client;
+import tw.zhuran.madtomson.core.ClientState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,13 @@ public class InterceptGroup extends Group {
         addActor(chiActor);
         addActor(passActor);
         actors = new ArrayList<>();
+    }
+
+    @Override
+    public void act(float delta) {
+        if (client.state() != ClientState.INTERCEPT) {
+            setVisible(false);
+        }
     }
 
     public void intercept(Piece piece, TriggerType triggerType, InterceptEvent event) {

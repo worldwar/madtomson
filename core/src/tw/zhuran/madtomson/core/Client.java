@@ -71,6 +71,7 @@ public class Client {
     }
 
     public void draw() {
+        stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }
 
@@ -95,16 +96,19 @@ public class Client {
     }
 
     public void sendChi(Piece piece, Group group) {
+        clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.chi(piece, group));
         connector.send(Packets.event(action, self));
     }
 
     public void sendPeng() {
+        clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.peng(piece));
         connector.send(Packets.event(action, self));
     }
 
     public void sendGang() {
+        clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.gang(piece));
         connector.send(Packets.event(action, self));
     }
@@ -232,6 +236,7 @@ public class Client {
                 if (packet instanceof InterceptPacket) {
                     InterceptPacket interceptPacket = (InterceptPacket) packet;
                     InterceptEvent content = interceptPacket.getContent();
+                    clientState = ClientState.INTERCEPT;
                     interceptGroup.intercept(piece, TriggerType.CAPTURE, content);
                     return;
                 }
@@ -271,7 +276,9 @@ public class Client {
     }
 
     private void handOtherAction(Event event) {
-
+        if (state() == ClientState.INTERCEPT) {
+            clientState = ClientState.FREE;
+        }
     }
 
     private void handleSelfAction(Event event) {
@@ -316,6 +323,7 @@ public class Client {
     }
 
     public void pass() {
+        clientState = ClientState.FREE;
         connector.send(Packets.event(Events.pass(self), 0));
     }
 
@@ -325,5 +333,9 @@ public class Client {
 
     public Hand hand() {
         return trunk().getHand();
+    }
+
+    public ClientState state() {
+        return clientState;
     }
 }
