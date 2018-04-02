@@ -31,9 +31,9 @@ public class P {
     public static int ACTION_HEIGHT = 280;
 
     public static void init() {
-        PIECES_TEXTURE = new Texture("mahjong.png");
-        BACK_TEXTURE = new Texture("back.jpg");
-        ACTIONS_TEXTURE = new Texture("actions.png");
+        PIECES_TEXTURE = makeTexture("mahjong.png");
+        BACK_TEXTURE = makeTexture("back.jpg");
+        ACTIONS_TEXTURE = makeTexture("actions.png");
         BITMAP_FONT = new BitmapFont();
         BACK_REGION = makeBack();
         $.each(Pieces.ALL, new Block<Piece>() {
@@ -48,6 +48,12 @@ public class P {
         ACTION_SPRITES.put("gang", makeAction(2));
         ACTION_SPRITES.put("win", makeAction(3));
         ACTION_SPRITES.put("pass", makeAction(4));
+    }
+
+    public static Texture makeTexture(String filename) {
+        Texture texture = new Texture(filename);
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        return texture;
     }
 
     public static Sprite makeBack() {
