@@ -74,9 +74,10 @@ public class P {
         int x = LEFT + col * (PIECE_WIDTH + COL_MARGIN);
         int y = TOP + row * (PIECE_HEIGHT+ ROW_MARGIN);
         Sprite sprite = new Sprite(PIECES_TEXTURE, x, y, PIECE_WIDTH, PIECE_HEIGHT);
-        sprite.setColor(1, 1, 1, 1);
+        sprite.setOrigin(0, 0);
         return sprite;
     }
+
     public static Sprite makeShowSelfPiece(Piece piece) {
         int row = piece.getKind().ordinal();
         int col  = piece.getIndex() - 1;
