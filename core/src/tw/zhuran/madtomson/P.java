@@ -31,6 +31,8 @@ public class P {
     public static int PIECE_HEIGHT = 140;
     public static int ACTION_WIDTH = 300;
     public static int ACTION_HEIGHT = 280;
+    public static int TABLE_WIDTH = 1200;
+    public static int TABLE_HEIGHT = 800;
 
     public static void init() {
         PIECES_TEXTURE = makeTexture("mahjong.png");

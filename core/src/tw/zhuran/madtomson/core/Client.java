@@ -14,9 +14,7 @@ import tw.zhuran.madtom.server.packet.*;
 import tw.zhuran.madtom.util.F;
 import tw.zhuran.madtom.util.ReverseNaturalTurner;
 import tw.zhuran.madtomson.P;
-import tw.zhuran.madtomson.core.actor.HandActor;
-import tw.zhuran.madtomson.core.actor.InterceptGroup;
-import tw.zhuran.madtomson.core.actor.PieceActor;
+import tw.zhuran.madtomson.core.actor.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +32,7 @@ public class Client {
     private Connector connector;
     private Stage stage;
     private HandActor handActor;
+    private DiscardGroup discardGroup;
     private InterceptGroup interceptGroup;
 
     public Client() {
@@ -44,9 +43,12 @@ public class Client {
         handActor = new HandActor(this);
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+
+        discardGroup = new DiscardGroup();
         interceptGroup = new InterceptGroup(this);
         stage.addActor(interceptGroup);
         stage.addActor(handActor);
+        stage.addActor(discardGroup);
     }
 
     public void start() {
@@ -90,6 +92,7 @@ public class Client {
         Trunk trunk = trunks.get(self);
         trunk.discard(piece);
         pieces.remove(piece);
+        discardGroup.add(new DiscardPieceActor(piece));
         clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.discard(piece));
         connector.send(Packets.event(action, self));
@@ -183,6 +186,11 @@ public class Client {
 
     private void initActors() {
         handActor.init();
+        for (Action action : trunk().getActions()) {
+            if (action.getType() == ActionType.DISCARD) {
+                discardGroup.add(new DiscardPieceActor(action.getPiece()));
+            }
+        }
     }
 
     private Trunk makeTrunk(int player, int handCount, List<Action> actions) {
