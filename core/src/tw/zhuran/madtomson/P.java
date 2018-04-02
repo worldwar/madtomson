@@ -14,9 +14,11 @@ import java.util.Map;
 
 public class P {
     public static Texture PIECES_TEXTURE;
+    public static Texture SHOW_SELF_PIECES_TEXTURE;
     public static Texture BACK_TEXTURE;
     public static Texture ACTIONS_TEXTURE;
     public static Map<Piece, Sprite> PIECES = new HashMap<Piece, Sprite>();
+    public static Map<Piece, Sprite> SHOW_SELF_PIECES = new HashMap<Piece, Sprite>();
     public static Map<String, Sprite> ACTION_SPRITES = new HashMap<String, Sprite>();
     public static TextureRegion BACK_REGION;
     public static BitmapFont BITMAP_FONT;
@@ -34,12 +36,14 @@ public class P {
         PIECES_TEXTURE = makeTexture("mahjong.png");
         BACK_TEXTURE = makeTexture("back.jpg");
         ACTIONS_TEXTURE = makeTexture("actions.png");
+        SHOW_SELF_PIECES_TEXTURE = makeTexture("show-self-pieces.png");
         BITMAP_FONT = new BitmapFont();
         BACK_REGION = makeBack();
         $.each(Pieces.ALL, new Block<Piece>() {
             @Override
             public void apply(Piece x) {
                 PIECES.put(x, makePiece(x));
+                SHOW_SELF_PIECES.put(x, makeShowSelfPiece(x));
             }
         });
 
@@ -73,6 +77,15 @@ public class P {
         sprite.setColor(1, 1, 1, 1);
         return sprite;
     }
+    public static Sprite makeShowSelfPiece(Piece piece) {
+        int row = piece.getKind().ordinal();
+        int col  = piece.getIndex() - 1;
+        int x = LEFT + col * (PIECE_WIDTH + COL_MARGIN);
+        int y = TOP + row * (PIECE_HEIGHT+ ROW_MARGIN);
+        Sprite sprite = new Sprite(SHOW_SELF_PIECES_TEXTURE, x, y, PIECE_WIDTH, PIECE_HEIGHT);
+        sprite.setOrigin(0, 0);
+        return sprite;
+    }
 
     public static Sprite makeAction(int index) {
         return new Sprite(ACTIONS_TEXTURE, index * ACTION_WIDTH, 0, ACTION_WIDTH, ACTION_HEIGHT);
@@ -80,6 +93,10 @@ public class P {
 
     public static Sprite sprite(Piece piece) {
         return PIECES.get(piece);
+    }
+
+    public static Sprite showSelfSprite(Piece piece) {
+        return SHOW_SELF_PIECES.get(piece);
     }
 
 

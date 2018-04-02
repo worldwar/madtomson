@@ -15,13 +15,13 @@ public class GroupActor extends Actor {
     private Action action;
     private List<Sprite> sprites;
     private Sprite sprite;
-    private float scale = 0.6f;
+    private float scale = 0.5f;
 
     public GroupActor(Action action, int index) {
         this.action = action;
         sprites = new ArrayList<>(3);
         for (Piece piece : action.getGroup().getPieces()) {
-            Sprite sprite = P.sprite(piece);
+            Sprite sprite = P.showSelfSprite(piece);
 
             sprites.add(sprite);
             if (this.sprite == null) {
@@ -41,15 +41,13 @@ public class GroupActor extends Actor {
         for (Sprite sprite : sprites) {
             sprite.setPosition(getX() + sprite.getWidth() * scale * i, getY());
             sprite.setScale(scale);
-            sprite.setRotation(getRotation());
             sprite.draw(batch, parentAlpha);
             i++;
         }
 
         if (action.getType() == ActionType.GANG || action.getType() == ActionType.XUGANG) {
-            sprite.setPosition(getX() + sprite.getWidth() * scale, getY() + 10);
+            sprite.setPosition(getX() + sprite.getWidth() * scale, getY() + sprite.getHeight() * scale * 0.28f);
             sprite.setScale(scale);
-            sprite.setRotation(getRotation());
             sprite.draw(batch, parentAlpha);
         }
     }
