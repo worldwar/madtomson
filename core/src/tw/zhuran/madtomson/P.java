@@ -16,10 +16,12 @@ public class P {
     public static Texture PIECES_TEXTURE;
     public static Texture SHOW_SELF_PIECES_TEXTURE;
     public static Texture BACK_TEXTURE;
+    public static Texture BACKS_TEXTURE;
     public static Texture ACTIONS_TEXTURE;
     public static Map<Piece, Sprite> PIECES = new HashMap<Piece, Sprite>();
     public static Map<Piece, Sprite> SHOW_SELF_PIECES = new HashMap<Piece, Sprite>();
     public static Map<String, Sprite> ACTION_SPRITES = new HashMap<String, Sprite>();
+    public static Map<String, Sprite> BACK_SPRITES = new HashMap<String, Sprite>();
     public static TextureRegion BACK_REGION;
     public static BitmapFont BITMAP_FONT;
 
@@ -34,9 +36,22 @@ public class P {
     public static int TABLE_WIDTH = 1200;
     public static int TABLE_HEIGHT = 800;
 
+    public static int BACK_STAND_HEIGHT = 56;
+    public static int BACK_STAND_WIDTH = 42;
+
+    public static int BACK_SLEEP_HEIGHT = 42;
+    public static int BACK_SLEEP_WIDTH = 58;
+
+    public static int BACK_BOTTOM_SLEEP_HEIGHT = 62;
+    public static int BACK_BOTTOM_SLEEP_WIDTH = 44;
+
+    public static int BACK_TOP_STAND_HEIGHT = 62;
+    public static int BACK_TOP_STAND_WIDTH = 44;
+
     public static void init() {
         PIECES_TEXTURE = makeTexture("mahjong.png");
         BACK_TEXTURE = makeTexture("back.jpg");
+        BACKS_TEXTURE = makeTexture("backs.png");
         ACTIONS_TEXTURE = makeTexture("actions.png");
         SHOW_SELF_PIECES_TEXTURE = makeTexture("show-self-pieces.png");
         BITMAP_FONT = new BitmapFont();
@@ -54,6 +69,17 @@ public class P {
         ACTION_SPRITES.put("gang", makeAction(2));
         ACTION_SPRITES.put("win", makeAction(3));
         ACTION_SPRITES.put("pass", makeAction(4));
+
+        BACK_SPRITES.put("left-stand", new Sprite(BACKS_TEXTURE, BACK_STAND_WIDTH, 0, BACK_STAND_WIDTH, BACK_STAND_HEIGHT));
+        BACK_SPRITES.put("right-stand", new Sprite(BACKS_TEXTURE, 0, 0, BACK_STAND_WIDTH, BACK_STAND_HEIGHT));
+        BACK_SPRITES.put("left-sleep", new Sprite(BACKS_TEXTURE, BACK_STAND_WIDTH * 2, 0, BACK_SLEEP_WIDTH, BACK_SLEEP_HEIGHT));
+        BACK_SPRITES.put("right-sleep", new Sprite(BACKS_TEXTURE, BACK_STAND_WIDTH * 2 + BACK_SLEEP_WIDTH, 0, BACK_SLEEP_WIDTH, BACK_SLEEP_HEIGHT));
+        BACK_SPRITES.put("bottom-sleep", new Sprite(BACKS_TEXTURE, 0, BACK_STAND_HEIGHT, BACK_BOTTOM_SLEEP_WIDTH, BACK_BOTTOM_SLEEP_HEIGHT));
+        BACK_SPRITES.put("top-stand", new Sprite(BACKS_TEXTURE, BACK_STAND_WIDTH, BACK_STAND_HEIGHT, BACK_BOTTOM_SLEEP_WIDTH, BACK_BOTTOM_SLEEP_HEIGHT));
+
+        for (Sprite sprite : BACK_SPRITES.values()) {
+            sprite.setOrigin(0, 0);
+        }
     }
 
     public static Texture makeTexture(String filename) {
@@ -102,9 +128,12 @@ public class P {
         return SHOW_SELF_PIECES.get(piece);
     }
 
-
     public static Sprite action(String action) {
         return ACTION_SPRITES.get(action);
+    }
+
+    public static Sprite back(String name) {
+        return BACK_SPRITES.get(name);
     }
 
     public static Sprite chi() {

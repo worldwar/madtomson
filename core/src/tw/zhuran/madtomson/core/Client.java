@@ -33,6 +33,7 @@ public class Client {
     private Stage stage;
     private HandActor handActor;
     private DiscardGroup discardGroup;
+    private BackGroup leftHandGroup;
     private InterceptGroup interceptGroup;
 
     public Client() {
@@ -46,9 +47,11 @@ public class Client {
 
         discardGroup = new DiscardGroup();
         interceptGroup = new InterceptGroup(this);
+        leftHandGroup = new BackGroup("left-stand");
         stage.addActor(interceptGroup);
         stage.addActor(handActor);
         stage.addActor(discardGroup);
+        stage.addActor(leftHandGroup);
     }
 
     public void start() {
@@ -191,6 +194,8 @@ public class Client {
                 discardGroup.add(new DiscardPieceActor(action.getPiece()));
             }
         }
+        Integer leftHandCount = info.getOtherHandCounts().get(left());
+        leftHandGroup.add(leftHandCount);
     }
 
     private Trunk makeTrunk(int player, int handCount, List<Action> actions) {
@@ -286,6 +291,12 @@ public class Client {
     private void handOtherAction(Event event) {
         if (state() == ClientState.INTERCEPT) {
             clientState = ClientState.FREE;
+        }
+        switch (event.getAction().getType()) {
+            case DISCARD:
+                if (event.getPlayer() == left()) {
+                    leftHandGroup.remove(1);
+                }
         }
     }
 
