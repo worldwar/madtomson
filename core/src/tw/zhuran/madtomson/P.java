@@ -52,8 +52,8 @@ public class P {
     public static int BACK_TOP_STAND_HEIGHT = 62;
     public static int BACK_TOP_STAND_WIDTH = 44;
 
-    public static int SLEEP_DISCARD_WIDTH = 37;
-    public static int SLEEP_DISCARD_HEIGHT = 51;
+    public static int SLEEP_DISCARD_WIDTH = 100;
+    public static int SLEEP_DISCARD_HEIGHT = 140;
 
     public static void init() {
         PIECES_TEXTURE = makeTexture("mahjong.png");

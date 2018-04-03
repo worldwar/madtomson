@@ -5,7 +5,7 @@ import tw.zhuran.madtom.domain.Piece;
 import tw.zhuran.madtomson.P;
 
 public class LeftDiscardPieceActor extends PieceActorBase {
-    public static float SCALE = 1.0f;
+    public static float SCALE = 0.4f;
     public LeftDiscardPieceActor(Piece piece) {
         super(piece, P.leftSprite(piece), SCALE);
         setWidth(sprite.getHeight() * SCALE);

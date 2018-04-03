@@ -284,6 +284,10 @@ public class Client {
         if (event.getPlayer() == self) {
             clientState = ClientState.ACTIVE;
             feed(event.getPiece());
+        } else {
+            if (event.getPlayer() == left()) {
+                leftHandGroup.increment();
+            }
         }
     }
 

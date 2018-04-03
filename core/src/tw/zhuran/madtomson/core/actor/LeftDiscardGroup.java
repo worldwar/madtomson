@@ -10,7 +10,7 @@ public class LeftDiscardGroup extends DiscardGroup {
     private double angle = Math.toRadians(5f);
     public LeftDiscardGroup() {
         pieceActors = new ArrayList<>();
-        float y = (P.TABLE_HEIGHT - cols * P.SLEEP_DISCARD_WIDTH * LeftDiscardPieceActor.SCALE) / 2;
+        float y = (P.TABLE_HEIGHT - cols * P.SLEEP_DISCARD_WIDTH * LeftDiscardPieceActor.SCALE) * 0.5f;
         setY(y);
         setX(P.TABLE_WIDTH * 0.1f);
     }
