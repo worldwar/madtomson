@@ -6,9 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import tw.zhuran.madtom.domain.Piece;
 
 public class PieceActorBase extends Actor {
-    private Piece piece;
-    private Sprite sprite;
-    private float scale;
+    protected Piece piece;
+    protected Sprite sprite;
+    protected float scale;
 
     public PieceActorBase(Piece piece, Sprite sprite, float scale) {
         this.piece = piece;

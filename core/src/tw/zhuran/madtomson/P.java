@@ -14,12 +14,16 @@ import java.util.Map;
 
 public class P {
     public static Texture PIECES_TEXTURE;
+    public static Texture LEFT_PIECES_TEXTURE;
+    public static Texture RIGHT_PIECES_TEXTURE;
     public static Texture SHOW_SELF_PIECES_TEXTURE;
     public static Texture BACK_TEXTURE;
     public static Texture BACKS_TEXTURE;
     public static Texture ACTIONS_TEXTURE;
     public static Map<Piece, Sprite> PIECES = new HashMap<Piece, Sprite>();
     public static Map<Piece, Sprite> SHOW_SELF_PIECES = new HashMap<Piece, Sprite>();
+    public static Map<Piece, Sprite> LEFT_DISCARD_PIECES = new HashMap<Piece, Sprite>();
+    public static Map<Piece, Sprite> RIGHT_DISCARD_PIECES = new HashMap<Piece, Sprite>();
     public static Map<String, Sprite> ACTION_SPRITES = new HashMap<String, Sprite>();
     public static Map<String, Sprite> BACK_SPRITES = new HashMap<String, Sprite>();
     public static TextureRegion BACK_REGION;
@@ -48,8 +52,13 @@ public class P {
     public static int BACK_TOP_STAND_HEIGHT = 62;
     public static int BACK_TOP_STAND_WIDTH = 44;
 
+    public static int SLEEP_DISCARD_WIDTH = 37;
+    public static int SLEEP_DISCARD_HEIGHT = 51;
+
     public static void init() {
         PIECES_TEXTURE = makeTexture("mahjong.png");
+        LEFT_PIECES_TEXTURE = makeTexture("left-pieces.png");
+        RIGHT_PIECES_TEXTURE = makeTexture("right-pieces.png");
         BACK_TEXTURE = makeTexture("back.jpg");
         BACKS_TEXTURE = makeTexture("backs.png");
         ACTIONS_TEXTURE = makeTexture("actions.png");
@@ -61,6 +70,8 @@ public class P {
             public void apply(Piece x) {
                 PIECES.put(x, makePiece(x));
                 SHOW_SELF_PIECES.put(x, makeShowSelfPiece(x));
+                LEFT_DISCARD_PIECES.put(x, makeLeftPiece(x));
+                RIGHT_DISCARD_PIECES.put(x, makeRightPiece(x));
             }
         });
 
@@ -96,23 +107,34 @@ public class P {
         return new TextureRegion(BACK_TEXTURE, 325, 120, 320, 400);
     }
 
-    public static Sprite makePiece(Piece piece) {
+    public static Sprite makePiece(Texture t, Piece piece, int width, int height) {
         int row = piece.getKind().ordinal();
         int col  = piece.getIndex() - 1;
-        int x = LEFT + col * (PIECE_WIDTH + COL_MARGIN);
-        int y = TOP + row * (PIECE_HEIGHT+ ROW_MARGIN);
-        Sprite sprite = new Sprite(PIECES_TEXTURE, x, y, PIECE_WIDTH, PIECE_HEIGHT);
+        int x = col * width;
+        int y = row * height;
+        Sprite sprite = new Sprite(t, x, y, width, height);
         sprite.setOrigin(0, 0);
         return sprite;
     }
 
+
+    public static Sprite makePiece(Piece piece) {
+        return makePiece(PIECES_TEXTURE, piece, PIECE_WIDTH, PIECE_HEIGHT);
+    }
+
     public static Sprite makeShowSelfPiece(Piece piece) {
-        int row = piece.getKind().ordinal();
-        int col  = piece.getIndex() - 1;
-        int x = LEFT + col * (PIECE_WIDTH + COL_MARGIN);
-        int y = TOP + row * (PIECE_HEIGHT+ ROW_MARGIN);
-        Sprite sprite = new Sprite(SHOW_SELF_PIECES_TEXTURE, x, y, PIECE_WIDTH, PIECE_HEIGHT);
-        sprite.setOrigin(0, 0);
+        return makePiece(SHOW_SELF_PIECES_TEXTURE, piece, PIECE_WIDTH, PIECE_HEIGHT);
+    }
+
+    public static Sprite makeLeftPiece(Piece piece) {
+        Sprite sprite = makePiece(LEFT_PIECES_TEXTURE, piece, SLEEP_DISCARD_WIDTH, SLEEP_DISCARD_HEIGHT);
+        sprite.setRotation(-90);
+        return sprite;
+    }
+
+    public static Sprite makeRightPiece(Piece piece) {
+        Sprite sprite = makePiece(RIGHT_PIECES_TEXTURE, piece, SLEEP_DISCARD_WIDTH, SLEEP_DISCARD_HEIGHT);
+        sprite.setRotation(90);
         return sprite;
     }
 
@@ -126,6 +148,14 @@ public class P {
 
     public static Sprite showSelfSprite(Piece piece) {
         return SHOW_SELF_PIECES.get(piece);
+    }
+
+    public static Sprite leftSprite(Piece piece) {
+        return LEFT_DISCARD_PIECES.get(piece);
+    }
+
+    public static Sprite rightSprite(Piece piece) {
+        return RIGHT_DISCARD_PIECES.get(piece);
     }
 
     public static Sprite action(String action) {

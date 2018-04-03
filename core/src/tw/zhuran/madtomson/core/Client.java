@@ -34,6 +34,7 @@ public class Client {
     private HandActor handActor;
     private DiscardGroup discardGroup;
     private BackGroup leftHandGroup;
+    private LeftDiscardGroup leftDiscardGroup;
     private InterceptGroup interceptGroup;
 
     public Client() {
@@ -48,10 +49,12 @@ public class Client {
         discardGroup = new DiscardGroup();
         interceptGroup = new InterceptGroup(this);
         leftHandGroup = new BackGroup("left-stand");
+        leftDiscardGroup = new LeftDiscardGroup();
         stage.addActor(interceptGroup);
         stage.addActor(handActor);
         stage.addActor(discardGroup);
         stage.addActor(leftHandGroup);
+        stage.addActor(leftDiscardGroup);
     }
 
     public void start() {
@@ -195,7 +198,14 @@ public class Client {
             }
         }
         Integer leftHandCount = info.getOtherHandCounts().get(left());
+        List<Action> leftActions = info.getOtherActions().get(left());
         leftHandGroup.add(leftHandCount);
+
+        for (Action action : leftActions) {
+            if (action.getType() == ActionType.DISCARD) {
+                leftDiscardGroup.add(new LeftDiscardPieceActor(action.getPiece()));
+            }
+        }
     }
 
     private Trunk makeTrunk(int player, int handCount, List<Action> actions) {
@@ -284,11 +294,11 @@ public class Client {
         if (event.getPlayer() == self) {
             handleSelfAction(event);
         } else {
-            handOtherAction(event);
+            handleOtherAction(event);
         }
     }
 
-    private void handOtherAction(Event event) {
+    private void handleOtherAction(Event event) {
         if (state() == ClientState.INTERCEPT) {
             clientState = ClientState.FREE;
         }
@@ -296,6 +306,7 @@ public class Client {
             case DISCARD:
                 if (event.getPlayer() == left()) {
                     leftHandGroup.remove(1);
+                    leftDiscardGroup.add(new LeftDiscardPieceActor(event.getAction().getPiece()));
                 }
         }
     }

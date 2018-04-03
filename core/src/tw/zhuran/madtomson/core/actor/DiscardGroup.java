@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscardGroup extends Group {
-    private List<PieceActorBase> pieceActors;
-    private int cols = 6;
-    private int rows = 4;
+    protected List<PieceActorBase> pieceActors;
+    protected int cols = 6;
+    protected int rows = 4;
 
     public DiscardGroup() {
         pieceActors = new ArrayList<>();
