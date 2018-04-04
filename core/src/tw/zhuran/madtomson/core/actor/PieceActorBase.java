@@ -8,20 +8,26 @@ import tw.zhuran.madtom.domain.Piece;
 public class PieceActorBase extends Actor {
     protected Piece piece;
     protected Sprite sprite;
-    protected float scale;
+    protected float sx;
+    protected float sy;
 
     public PieceActorBase(Piece piece, Sprite sprite, float scale) {
+        this(piece, sprite, scale, scale);
+    }
+
+    public PieceActorBase(Piece piece, Sprite sprite, float sx, float sy) {
         this.piece = piece;
         this.sprite = sprite;
-        this.scale = scale;
-        setWidth(sprite.getWidth() * scale);
-        setHeight(sprite.getHeight() * scale);
+        this.sx = sx;
+        this.sy = sy;
+        setWidth(sprite.getWidth() * sx);
+        setHeight(sprite.getHeight() * sy);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.setPosition(getX(), getY());
-        sprite.setScale(scale);
+        sprite.setScale(sx, sy);
         sprite.draw(batch);
     }
 

@@ -36,6 +36,7 @@ public class Client {
     private BackGroup leftHandGroup;
     private LeftDiscardGroup leftDiscardGroup;
     private InterceptGroup interceptGroup;
+    private com.badlogic.gdx.scenes.scene2d.Group leftActionGroup;
 
     public Client() {
         clientState = ClientState.INIT;
@@ -50,11 +51,17 @@ public class Client {
         interceptGroup = new InterceptGroup(this);
         leftHandGroup = new BackGroup("left-stand");
         leftDiscardGroup = new LeftDiscardGroup();
+        leftActionGroup = new com.badlogic.gdx.scenes.scene2d.Group();
+
+        leftActionGroup.setX(200);
+        leftActionGroup.setY(P.TABLE_HEIGHT - 100);
+
         stage.addActor(interceptGroup);
         stage.addActor(handActor);
         stage.addActor(discardGroup);
         stage.addActor(leftHandGroup);
         stage.addActor(leftDiscardGroup);
+        stage.addActor(leftActionGroup);
     }
 
     public void start() {
@@ -311,6 +318,16 @@ public class Client {
                 if (event.getPlayer() == left()) {
                     leftHandGroup.remove(1);
                     leftDiscardGroup.add(new LeftDiscardPieceActor(event.getAction().getPiece()));
+                }
+                break;
+            case GANG:
+            case ANGANG:
+            case PENG:
+            case CHI:
+                if (event.getPlayer() == left()) {
+                    leftHandGroup.remove(DumbTrunk.discardCount(event.getAction().getType()));
+                    leftActionGroup.addActor(new LeftGroupActor(event.getAction(), leftActionGroup.getChildren().size));
+                    break;
                 }
         }
     }

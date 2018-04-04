@@ -151,6 +151,9 @@ public class P {
     }
 
     public static Sprite leftSprite(Piece piece) {
+        if (piece == null) {
+            return back("left-sleep");
+        }
         return LEFT_DISCARD_PIECES.get(piece);
     }
 

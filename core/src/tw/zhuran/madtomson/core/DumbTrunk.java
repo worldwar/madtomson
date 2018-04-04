@@ -44,7 +44,7 @@ public class DumbTrunk {
         }
     }
 
-    public int discardCount(ActionType type) {
+    public static int discardCount(ActionType type) {
         switch (type) {
             case DISCARD:
             case XUGANG:
