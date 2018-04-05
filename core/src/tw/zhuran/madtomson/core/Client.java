@@ -327,6 +327,8 @@ public class Client {
     private void handGangAfford(GangAffordEvent event) {
         if (event.getPlayer() == self) {
             feed(event.getPiece());
+        } else if (event.getPlayer() == left()) {
+            leftTrunk.feed();
         }
     }
 
