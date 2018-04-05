@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.math.Affine2;
+import com.google.common.collect.Lists;
 import tw.zhuran.madtom.domain.*;
 import tw.zhuran.madtom.event.*;
 import tw.zhuran.madtom.server.EventPacket;
@@ -33,6 +34,7 @@ public class Client {
     private Stage stage;
     private HandActor handActor;
     private SelfDiscardGroup selfDiscardGroup;
+    private SelfDiscardGroup gangGroup;
     private InterceptGroup interceptGroup;
     private DumbTrunk leftTrunk;
 
@@ -46,12 +48,16 @@ public class Client {
         Gdx.input.setInputProcessor(stage);
 
         selfDiscardGroup = new SelfDiscardGroup();
+        gangGroup = new SelfDiscardGroup(4, 2);
+        gangGroup.setX(150);
+        gangGroup.setY(50);
         interceptGroup = new InterceptGroup(this);
         leftTrunk = new LeftDumbTrunk(stage);
 
         stage.addActor(interceptGroup);
         stage.addActor(handActor);
         stage.addActor(selfDiscardGroup);
+        stage.addActor(gangGroup);
     }
 
     public void start() {
@@ -76,6 +82,7 @@ public class Client {
     }
 
     public void draw() {
+        stage.setDebugAll(true);
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }
@@ -98,6 +105,51 @@ public class Client {
         selfDiscardGroup.add(new DiscardPieceActor(piece));
         clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.discard(piece));
+        connector.send(Packets.event(action, self));
+    }
+
+    public void gang(Piece piece) {
+        if (piece.equals(Pieces.HONGZHONG)) {
+            hongzhongGang();
+        } else if (piece.equals(wildcard)) {
+            laiziGang();
+        } else if (trunk().xugangable(piece)) {
+            xugang(piece);
+        } else if (trunk().angangable(piece)) {
+            angang(piece);
+        }
+    }
+
+    public List<Piece> genericGangablePieces() {
+        List<Piece> pieces = Lists.newArrayList();
+        if (trunk().hongzhongGangable()) {
+            pieces.add(Pieces.HONGZHONG);
+        }
+        if (trunk().laiziGangable()) {
+            pieces.add(wildcard);
+        }
+        pieces.addAll(trunk().xugangablePieces());
+        pieces.addAll(trunk().getHand().angangablePieces());
+        return pieces;
+    }
+
+    private void hongzhongGang() {
+        Event action = Events.action(self, Actions.hongzhongGang());
+        connector.send(Packets.event(action, self));
+    }
+
+    private void laiziGang() {
+        Event action = Events.action(self, Actions.laiziGang(wildcard));
+        connector.send(Packets.event(action, self));
+    }
+
+    private void xugang(Piece piece) {
+        Event action = Events.action(self, Actions.xugang(piece));
+        connector.send(Packets.event(action, self));
+    }
+
+    private void angang(Piece piece) {
+        Event action = Events.action(self, Actions.angang(piece));
         connector.send(Packets.event(action, self));
     }
 
@@ -255,6 +307,13 @@ public class Client {
                     return;
                 }
 
+                if (packet instanceof CommandPacket) {
+                    CommandPacket commandPacket = (CommandPacket) packet;
+                    CommandEvent content = commandPacket.getContent();
+                    interceptGroup.command(content);
+                    return;
+                }
+
                 EventPacket eventPacket = (EventPacket) packet;
                 Event content = eventPacket.getContent();
                 handleEvent(content);
@@ -321,6 +380,24 @@ public class Client {
                 handActor.performAction(action);
                 trunk.gang(action.getPiece());
                 clientState = ClientState.ACTIVE;
+                break;
+            case HONGZHONG_GANG:
+                trunk.hongzhongGang();
+                handActor.performAction(action);
+                gangGroup.add(Pieces.HONGZHONG);
+                break;
+            case LAIZI_GANG:
+                trunk.laiziGang();
+                handActor.performAction(action);
+                gangGroup.add(wildcard);
+                break;
+            case XUGANG:
+                trunk.xugang(action.getPiece());
+                handActor.performAction(action);
+                break;
+            case ANGANG:
+                trunk.angang(action.getPiece());
+                handActor.performAction(action);
                 break;
         }
     }

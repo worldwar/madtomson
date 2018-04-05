@@ -70,7 +70,12 @@ public class DumbTrunk {
         if (action.getType() == ActionType.DISCARD) {
             discardGroup.add(action.getPiece());
         } else {
-            actionGroup.add(action);
+            if (action.getType() == ActionType.PENG ||
+                    action.getType() == ActionType.CHI ||
+                    action.getType() == ActionType.GANG ||
+                    action.getType() == ActionType.ANGANG) {
+                actionGroup.add(action);
+            }
         }
     }
 

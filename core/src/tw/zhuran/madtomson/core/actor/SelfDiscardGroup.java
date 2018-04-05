@@ -11,6 +11,15 @@ public class SelfDiscardGroup extends AbstractDiscardGroup {
         setY(P.TABLE_HEIGHT * 0.1f);
     }
 
+    public SelfDiscardGroup(int cols, int rows) {
+        super();
+        this.cols = cols;
+        this.rows = rows;
+        float x = (P.TABLE_WIDTH - cols * P.PIECE_WIDTH * DiscardPieceActor.scale) / 2;
+        setX(x);
+        setY(P.TABLE_HEIGHT * 0.1f);
+    }
+
     public void add(PieceActorBase pieceActor) {
         int size = pieceActors.size();
         int index = size;

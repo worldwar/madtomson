@@ -109,7 +109,7 @@ public class HandActor extends Group {
 
     private void addGroup(Action action) {
         switch (action.getType()) {
-            case CHI: case PENG: case GANG: case XUGANG: case ANGANG:
+            case CHI: case PENG: case GANG: case ANGANG:
                 GroupActor groupActor = new GroupActor(action, groupActors.size());
                 groupActors.add(groupActor);
                 addActor(groupActor);
@@ -137,6 +137,10 @@ public class HandActor extends Group {
                 return F.repeat(action.getPiece(), 3);
             case ANGANG:
                 return F.repeat(action.getPiece(), 4);
+            case HONGZHONG_GANG:
+            case XUGANG:
+            case LAIZI_GANG:
+                return F.repeat(action.getPiece(), 1);
         }
         return new ArrayList<>();
     }

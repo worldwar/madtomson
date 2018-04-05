@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import tw.zhuran.madtom.domain.Hand;
 import tw.zhuran.madtom.domain.Piece;
 import tw.zhuran.madtom.domain.TriggerType;
+import tw.zhuran.madtom.event.CommandEvent;
 import tw.zhuran.madtom.event.InterceptEvent;
 import tw.zhuran.madtom.event.InterceptType;
 import tw.zhuran.madtomson.core.Client;
@@ -22,6 +23,8 @@ public class InterceptGroup extends Group {
     private PengActor pengActor;
     private GangActor gangActor;
     private List<ActionActor> actors;
+    private boolean intercept;
+    private boolean command;
 
     public InterceptGroup(Client client) {
         setVisible(false);
@@ -42,12 +45,17 @@ public class InterceptGroup extends Group {
 
     @Override
     public void act(float delta) {
-        if (client.state() != ClientState.INTERCEPT) {
+        if (client.state() != ClientState.INTERCEPT && intercept) {
+            setVisible(false);
+        }
+        if (client.state() != ClientState.ACTIVE && command) {
             setVisible(false);
         }
     }
 
     public void intercept(Piece piece, TriggerType triggerType, InterceptEvent event) {
+        intercept = true;
+        command = false;
         hideActors();
         actors.clear();
         List<InterceptType> intercepts = event.getIntercepts();
@@ -62,12 +70,38 @@ public class InterceptGroup extends Group {
             } else if (interceptType == InterceptType.PENG) {
                 actors.add(pengActor);
             } else if (interceptType == InterceptType.GANG) {
+                gangActor.initIntercept();
                 actors.add(gangActor);
             }
         }
 
         actors.add(passActor);
 
+        for (int i = 0; i < actors.size(); i++) {
+            ActionActor actor = actors.get(i);
+            actor.setIndex(i);
+            actor.setVisible(true);
+        }
+        setVisible(true);
+    }
+
+    public void command(CommandEvent event) {
+        intercept = false;
+        command = true;
+        hideActors();
+        actors.clear();
+        List<InterceptType> intercepts = event.getIntercepts();
+        for (InterceptType interceptType : intercepts) {
+            if (interceptType == InterceptType.WIN) {
+            } else if (interceptType == InterceptType.GANG) {
+
+                List<Piece> pieces = client.genericGangablePieces();
+                if (pieces.size() != 0) {
+                    gangActor.initOptions(pieces);
+                    actors.add(gangActor);
+                }
+            }
+        }
         for (int i = 0; i < actors.size(); i++) {
             ActionActor actor = actors.get(i);
             actor.setIndex(i);
