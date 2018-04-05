@@ -1,21 +1,19 @@
 package tw.zhuran.madtomson.core.actor;
 
+import tw.zhuran.madtom.domain.Piece;
 import tw.zhuran.madtomson.P;
 
-import java.util.ArrayList;
-
-public class LeftDiscardGroup extends DiscardGroup {
+public class LeftDiscardGroup extends AbstractDiscardGroup {
 
     private float angleRatio = 0.7f;
     private double angle = Math.toRadians(5f);
     public LeftDiscardGroup() {
-        pieceActors = new ArrayList<>();
+        super();
         float y = (P.TABLE_HEIGHT - cols * P.SLEEP_DISCARD_WIDTH * LeftDiscardPieceActor.SCALE_Y) * 0.5f;
         setY(y);
         setX(P.TABLE_WIDTH * 0.1f);
     }
 
-    @Override
     public void add(PieceActorBase pieceActor) {
         clearChildren();
 
@@ -43,5 +41,10 @@ public class LeftDiscardGroup extends DiscardGroup {
                 addActor(pieceActors.get(index));
             }
         }
+    }
+
+    @Override
+    public void add(Piece piece) {
+        add(new LeftDiscardPieceActor(piece));
     }
 }

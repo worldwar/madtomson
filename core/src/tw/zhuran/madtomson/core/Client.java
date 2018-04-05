@@ -32,11 +32,9 @@ public class Client {
     private Connector connector;
     private Stage stage;
     private HandActor handActor;
-    private DiscardGroup discardGroup;
-    private BackGroup leftHandGroup;
-    private LeftDiscardGroup leftDiscardGroup;
+    private SelfDiscardGroup selfDiscardGroup;
     private InterceptGroup interceptGroup;
-    private com.badlogic.gdx.scenes.scene2d.Group leftActionGroup;
+    private DumbTrunk leftTrunk;
 
     public Client() {
         clientState = ClientState.INIT;
@@ -47,21 +45,13 @@ public class Client {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
-        discardGroup = new DiscardGroup();
+        selfDiscardGroup = new SelfDiscardGroup();
         interceptGroup = new InterceptGroup(this);
-        leftHandGroup = new BackGroup("left-stand");
-        leftDiscardGroup = new LeftDiscardGroup();
-        leftActionGroup = new com.badlogic.gdx.scenes.scene2d.Group();
-
-        leftActionGroup.setX(200);
-        leftActionGroup.setY(P.TABLE_HEIGHT - 100);
+        leftTrunk = new LeftDumbTrunk(stage);
 
         stage.addActor(interceptGroup);
         stage.addActor(handActor);
-        stage.addActor(discardGroup);
-        stage.addActor(leftHandGroup);
-        stage.addActor(leftDiscardGroup);
-        stage.addActor(leftActionGroup);
+        stage.addActor(selfDiscardGroup);
     }
 
     public void start() {
@@ -105,7 +95,7 @@ public class Client {
         Trunk trunk = trunks.get(self);
         trunk.discard(piece);
         pieces.remove(piece);
-        discardGroup.add(new DiscardPieceActor(piece));
+        selfDiscardGroup.add(new DiscardPieceActor(piece));
         clientState = ClientState.FREE;
         Event action = Events.action(self, Actions.discard(piece));
         connector.send(Packets.event(action, self));
@@ -201,18 +191,12 @@ public class Client {
         handActor.init();
         for (Action action : trunk().getActions()) {
             if (action.getType() == ActionType.DISCARD) {
-                discardGroup.add(new DiscardPieceActor(action.getPiece()));
+                selfDiscardGroup.add(new DiscardPieceActor(action.getPiece()));
             }
         }
         Integer leftHandCount = info.getOtherHandCounts().get(left());
         List<Action> leftActions = info.getOtherActions().get(left());
-        leftHandGroup.add(leftHandCount);
-
-        for (Action action : leftActions) {
-            if (action.getType() == ActionType.DISCARD) {
-                leftDiscardGroup.add(new LeftDiscardPieceActor(action.getPiece()));
-            }
-        }
+        leftTrunk.init(leftHandCount, leftActions);
     }
 
     private Trunk makeTrunk(int player, int handCount, List<Action> actions) {
@@ -293,7 +277,7 @@ public class Client {
             feed(event.getPiece());
         } else {
             if (event.getPlayer() == left()) {
-                leftHandGroup.increment();
+                leftTrunk.feed();
             }
         }
     }
@@ -313,22 +297,9 @@ public class Client {
         if (state() == ClientState.INTERCEPT) {
             clientState = ClientState.FREE;
         }
-        switch (event.getAction().getType()) {
-            case DISCARD:
-                if (event.getPlayer() == left()) {
-                    leftHandGroup.remove(1);
-                    leftDiscardGroup.add(new LeftDiscardPieceActor(event.getAction().getPiece()));
-                }
-                break;
-            case GANG:
-            case ANGANG:
-            case PENG:
-            case CHI:
-                if (event.getPlayer() == left()) {
-                    leftHandGroup.remove(DumbTrunk.discardCount(event.getAction().getType()));
-                    leftActionGroup.addActor(new LeftGroupActor(event.getAction(), leftActionGroup.getChildren().size));
-                    break;
-                }
+
+        if (event.getPlayer() == left()) {
+            leftTrunk.perform(event.getAction());
         }
     }
 
