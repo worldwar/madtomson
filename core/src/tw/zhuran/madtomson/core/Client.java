@@ -54,10 +54,10 @@ public class Client {
         interceptGroup = new InterceptGroup(this);
         leftTrunk = new LeftDumbTrunk(stage);
 
-        stage.addActor(interceptGroup);
         stage.addActor(handActor);
         stage.addActor(selfDiscardGroup);
         stage.addActor(gangGroup);
+        stage.addActor(interceptGroup);
     }
 
     public void start() {

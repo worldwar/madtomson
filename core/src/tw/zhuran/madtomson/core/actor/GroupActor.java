@@ -32,7 +32,6 @@ public class GroupActor extends Actor {
         setWidth(sprite.getWidth() * 3 * scale);
         setHeight(sprite.getHeight() * scale);
         setX((getWidth() + 20) * index);
-        setRotation(15);
     }
 
     @Override
@@ -50,5 +49,16 @@ public class GroupActor extends Actor {
             sprite.setScale(scale);
             sprite.draw(batch, parentAlpha);
         }
+
+        if (action.getType() == ActionType.ANGANG) {
+            Sprite back = P.back("bottom-sleep");
+            back.setPosition(getX() + sprite.getWidth() * scale, getY() + sprite.getHeight() * scale * 0.28f);
+            back.setScale(1.1f);
+            back.draw(batch, parentAlpha);
+        }
+    }
+
+    public Action getAction() {
+        return action;
     }
 }

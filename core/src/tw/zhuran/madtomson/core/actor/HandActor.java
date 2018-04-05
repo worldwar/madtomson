@@ -5,6 +5,7 @@ import com.github.underscore.$;
 import com.github.underscore.Optional;
 import com.github.underscore.Predicate;
 import tw.zhuran.madtom.domain.Action;
+import tw.zhuran.madtom.domain.ActionType;
 import tw.zhuran.madtom.domain.Piece;
 import tw.zhuran.madtom.domain.Trunk;
 import tw.zhuran.madtom.util.F;
@@ -113,6 +114,16 @@ public class HandActor extends Group {
                 GroupActor groupActor = new GroupActor(action, groupActors.size());
                 groupActors.add(groupActor);
                 addActor(groupActor);
+                break;
+            case XUGANG:
+                for (GroupActor actor : groupActors) {
+                    Action target = actor.getAction();
+                    if (target.getType() == ActionType.PENG && target.getPiece().equals(action.getPiece())) {
+                        target.xugang();
+                        break;
+                    }
+                }
+                break;
         }
     }
 
