@@ -21,11 +21,14 @@ public class LeftGroupActor extends Group {
 
         int i = 0;
 
-        LeftDiscardPieceActor secondActor = null;
+        PieceActorBase secondActor = null;
+        if (action.getType() == ActionType.ANGANG) {
+            angle = Math.toRadians(15f);
+        }
         for (Piece piece : action.getGroup().getPieces()) {
-            LeftDiscardPieceActor actor;
+            PieceActorBase actor;
             if (action.getType() == ActionType.ANGANG) {
-                actor = new LeftDiscardPieceActor(null);
+                actor = new LeftBackSleepPieceActor();
             } else {
                 actor = new LeftDiscardPieceActor(piece);
             }
@@ -41,9 +44,17 @@ public class LeftGroupActor extends Group {
         }
 
         if (action.getType() == ActionType.GANG || action.getType() == ActionType.XUGANG || action.getType() == ActionType.ANGANG) {
-            LeftDiscardPieceActor actor = new LeftDiscardPieceActor(action.getPiece());
-            float x = secondActor.getX() - secondActor.getWidth() * 0.3f;
-            float y = getY() - i * actor.getHeight() * 0.25f;
+            PieceActorBase actor;
+            float leftDeltaX;
+            if (action.getType() == ActionType.ANGANG) {
+                actor = new LeftBackSleepPieceActor();
+                leftDeltaX = 0.15f;
+            } else {
+                actor = new LeftDiscardPieceActor(action.getPiece());
+                leftDeltaX = 0.05f;
+            }
+            float x = secondActor.getX() - secondActor.getWidth() * leftDeltaX;
+            float y = secondActor.getY() + secondActor.getHeight() * 0.25f;
             actor.setPosition(x, y);
             addActor(actor);
         }
