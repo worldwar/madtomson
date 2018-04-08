@@ -14,6 +14,15 @@ public class LeftDiscardGroup extends AbstractDiscardGroup {
         setX(P.TABLE_WIDTH * 0.1f);
     }
 
+    public LeftDiscardGroup(int rows, int cols) {
+        super();
+        this.rows = rows;
+        this.cols = cols;
+        float y = (P.TABLE_HEIGHT - cols * P.SLEEP_DISCARD_WIDTH * LeftDiscardPieceActor.SCALE_Y) * 0.5f;
+        setY(y);
+        setX(P.TABLE_WIDTH * 0.1f);
+    }
+
     public void add(PieceActorBase pieceActor) {
         clearChildren();
 

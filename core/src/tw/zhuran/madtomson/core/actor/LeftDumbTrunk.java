@@ -9,6 +9,7 @@ public class LeftDumbTrunk extends DumbTrunk {
         super(stage);
         this.handGroup = new BackGroup("left-stand");
         this.discardGroup = new LeftDiscardGroup();
+        this.gangGroup = new LeftDiscardGroup(2, 4);
         this.actionGroup = new LeftActionGroup();
         actionGroup.setX(200);
         actionGroup.setY(P.TABLE_HEIGHT - 100);

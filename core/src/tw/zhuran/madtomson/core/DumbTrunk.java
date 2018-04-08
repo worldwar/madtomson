@@ -17,6 +17,7 @@ public class DumbTrunk {
 
     protected BackGroup handGroup;
     protected AbstractDiscardGroup discardGroup;
+    protected AbstractDiscardGroup gangGroup;
     protected IndexedGroup<Action> actionGroup;
 
     public DumbTrunk(Stage stage) {
@@ -31,6 +32,7 @@ public class DumbTrunk {
 
         stage.addActor(handGroup);
         stage.addActor(discardGroup);
+        stage.addActor(gangGroup);
         stage.addActor(actionGroup);
 
         handGroup.add(handCount);
@@ -75,6 +77,8 @@ public class DumbTrunk {
                     action.getType() == ActionType.GANG ||
                     action.getType() == ActionType.ANGANG) {
                 actionGroup.add(action);
+            } else if (action.getType() == ActionType.HONGZHONG_GANG || action.getType() == ActionType.LAIZI_GANG) {
+                gangGroup.add(action.getPiece());
             }
         }
     }
