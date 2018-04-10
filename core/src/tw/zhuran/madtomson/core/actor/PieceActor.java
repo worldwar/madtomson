@@ -16,7 +16,7 @@ public class PieceActor extends Actor implements Comparable<PieceActor> {
     private float scale = 0.7f;
     private boolean isWildcard;
 
-    public PieceActor(final Client client, Piece piece, int index) {
+    public PieceActor(final Client client, final Piece piece, int index) {
         this.client = client;
         this.piece = piece;
         this.sprite = P.sprite(piece);
@@ -26,7 +26,7 @@ public class PieceActor extends Actor implements Comparable<PieceActor> {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                client.tryDiscard(that);
+                client.sendDiscard(piece);
                 return true;
             }
 

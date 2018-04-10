@@ -1,51 +1,42 @@
 package tw.zhuran.madtomson.core.actor;
 
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.github.underscore.$;
 import com.github.underscore.Optional;
 import com.github.underscore.Predicate;
-import tw.zhuran.madtom.domain.Action;
-import tw.zhuran.madtom.domain.ActionType;
-import tw.zhuran.madtom.domain.Piece;
-import tw.zhuran.madtom.domain.Trunk;
-import tw.zhuran.madtom.util.F;
+import tw.zhuran.madtom.domain.*;
 import tw.zhuran.madtomson.core.Client;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class HandActor extends Group {
+public class HandActor extends HandGroup {
     private Client client;
-    private Trunk trunk;
-    private List<GroupActor> groupActors;
     private List<PieceActor> pieceActors;
     private PieceActor feedActor;
     private int start;
+    private Piece wildcard;
 
     public HandActor(Client client) {
         this.client = client;
-        groupActors = new ArrayList<>();
         pieceActors = new ArrayList<>();
     }
 
-    public void init() {
+    @Override
+    public void init(List<Piece> pieces, Piece wildcard) {
+        this.wildcard = wildcard;
         pieceActors.clear();
-        trunk = client.trunk();
-        for (Piece piece : trunk.getHand().all()) {
+        for (Piece piece : pieces) {
             PieceActor pieceActor = newPieceActor(piece);
             pieceActors.add(pieceActor);
         }
         Collections.sort(pieceActors);
         update();
-        for (Action action : trunk.getActions()) {
-            addGroup(action);
-        }
     }
 
     public PieceActor newPieceActor(Piece piece) {
         PieceActor pieceActor = new PieceActor(client, piece, 0);
-        pieceActor.setWildcard(trunk.getHand().getWildcard().equals(piece));
+        pieceActor.setWildcard(wildcard.equals(piece));
         addActor(pieceActor);
         return pieceActor;
     }
@@ -74,11 +65,17 @@ public class HandActor extends Group {
         return pieceActorOptional.orNull();
     }
 
+    @Override
+    public void add(Piece piece) {
+        feed(piece);
+    }
+
     public void feed(Piece piece) {
         feedActor = newPieceActor(piece);
         feedActor.setIndex(15);
     }
 
+    @Override
     public void remove(Piece piece) {
         if (feedActor != null && piece.equals(feedActor.getPiece())) {
             removeFeedActor();
@@ -97,33 +94,10 @@ public class HandActor extends Group {
         }
     }
 
+    @Override
     public void remove(List<Piece> pieces) {
         for (Piece piece : pieces) {
             remove(piece);
-        }
-    }
-
-    public void performAction(Action action) {
-        remove(partners(action));
-        addGroup(action);
-    }
-
-    private void addGroup(Action action) {
-        switch (action.getType()) {
-            case CHI: case PENG: case GANG: case ANGANG:
-                GroupActor groupActor = new GroupActor(action, groupActors.size());
-                groupActors.add(groupActor);
-                addActor(groupActor);
-                break;
-            case XUGANG:
-                for (GroupActor actor : groupActors) {
-                    Action target = actor.getAction();
-                    if (target.getType() == ActionType.PENG && target.getPiece().equals(action.getPiece())) {
-                        target.xugang();
-                        break;
-                    }
-                }
-                break;
         }
     }
 
@@ -137,22 +111,5 @@ public class HandActor extends Group {
             feedActor.remove();
             feedActor = null;
         }
-    }
-
-    public List<Piece> partners(Action action) {
-        switch (action.getType()) {
-            case CHI:
-            case PENG:
-                return action.getGroup().partners(action.getPiece());
-            case GANG:
-                return F.repeat(action.getPiece(), 3);
-            case ANGANG:
-                return F.repeat(action.getPiece(), 4);
-            case HONGZHONG_GANG:
-            case XUGANG:
-            case LAIZI_GANG:
-                return F.repeat(action.getPiece(), 1);
-        }
-        return new ArrayList<>();
     }
 }

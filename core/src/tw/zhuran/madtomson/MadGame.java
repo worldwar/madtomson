@@ -27,10 +27,6 @@ public class MadGame extends ApplicationAdapter {
 		client.draw();
 	}
 
-	private void draw(SpriteBatch batch, Client client) {
-		client.draw(batch);
-	}
-
 	@Override
 	public void dispose () {
 		batch.dispose();

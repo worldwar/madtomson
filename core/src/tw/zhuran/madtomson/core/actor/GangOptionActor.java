@@ -17,7 +17,7 @@ public class GangOptionActor extends PieceActorBase {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Client client = gangActor.client();
-                client.gang(piece);
+                client.genericGang(piece);
                 gangActor.hide();
                 return true;
             }

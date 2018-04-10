@@ -62,7 +62,7 @@ public class InterceptGroup extends Group {
         for (InterceptType interceptType : intercepts) {
             if (interceptType == InterceptType.WIN) {
             } else if (interceptType == InterceptType.CHI) {
-                List<tw.zhuran.madtom.domain.Group> groups = client.hand().chiableSequences(piece);
+                List<tw.zhuran.madtom.domain.Group> groups = client.chiableSequences(piece);
                 if (groups.size() != 0) {
                     chiActor.initOptions(piece, groups);
                     actors.add(chiActor);

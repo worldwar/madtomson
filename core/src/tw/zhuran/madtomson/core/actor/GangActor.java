@@ -57,7 +57,7 @@ public class GangActor extends ActionActor {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (pieces.size() == 1) {
-                    client.gang(pieces.get(0));
+                    client.genericGang(pieces.get(0));
                     getParent().setVisible(false);
                 } else {
                     that.showOptions();
