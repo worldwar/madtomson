@@ -11,11 +11,18 @@ public class BackGroup extends Actor {
     private float angleRatio = 0.7f;
     private double angle = Math.toRadians(15f);
     private Sprite sprite;
+    private String name;
 
     public BackGroup(String name) {
+        this.name = name;
         this.sprite = P.back(name);
-        setX(100);
-        setY(200);
+        if (name.equals("left-stand")) {
+            setX(100);
+            setY(200);
+        } else if (name.equals("right-stand")) {
+            setX(P.TABLE_WIDTH - 200);
+            setY(P.TABLE_HEIGHT - 200);
+        }
     }
 
     public void increment() {
@@ -37,8 +44,14 @@ public class BackGroup extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         for (int i = size - 1; i >= 0; i--) {
-            double x = getX() + sprite.getWidth() * scale * angleRatio * Math.sin(angle) * i;
-            double y = getY() + sprite.getWidth() * scale * angleRatio * Math.cos(angle) * i;
+            double x = 0, y = 0;
+            if (name.equals("left-stand")) {
+                x = getX() + sprite.getWidth() * scale * angleRatio * Math.sin(angle) * i;
+                y = getY() + sprite.getWidth() * scale * angleRatio * Math.cos(angle) * i;
+            } else if (name.equals("right-stand")) {
+                x = getX() + sprite.getWidth() * scale * angleRatio * Math.sin(angle) * (size - i);
+                y = getY() - sprite.getWidth() * scale * angleRatio * Math.cos(angle) * (size - i);
+            }
             sprite.setPosition((int)x, (int)y);
             sprite.setScale(scale);
             sprite.draw(batch, parentAlpha);

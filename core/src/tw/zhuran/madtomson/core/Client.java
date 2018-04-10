@@ -9,6 +9,7 @@ import tw.zhuran.madtom.server.EventPacket;
 import tw.zhuran.madtom.server.Packets;
 import tw.zhuran.madtom.server.packet.*;
 import tw.zhuran.madtom.util.F;
+import tw.zhuran.madtom.util.NaturalTurner;
 import tw.zhuran.madtom.util.ReverseNaturalTurner;
 import tw.zhuran.madtomson.core.actor.*;
 
@@ -27,6 +28,7 @@ public class Client {
     private Stage stage;
     private InterceptGroup interceptGroup;
     private LeftDumbTrunk leftTrunk;
+    private RightDumbTrunk rightTrunk;
     private SelfDumbTrunk selfTrunk;
     private Trunk trunk;
     private Map<Integer, DumbTrunk> dumbTrunks;
@@ -40,6 +42,7 @@ public class Client {
         Gdx.input.setInputProcessor(stage);
 
         leftTrunk = new LeftDumbTrunk(this, stage);
+        rightTrunk = new RightDumbTrunk(this, stage);
         selfTrunk = new SelfDumbTrunk(this, stage);
         interceptGroup = new InterceptGroup(this);
         stage.addActor(interceptGroup);
@@ -137,17 +140,25 @@ public class Client {
         return turner.next();
     }
 
+    private int right() {
+        NaturalTurner turner = new NaturalTurner(4);
+        turner.turnTo(self);
+        return turner.next();
+    }
+
     public void init(Info info) {
         dealer = info.getDealer();
         turn = info.getTurn();
         self = info.getSelf();
         wildcard = info.getWildcard();
 
-        selfTrunk.setPlayer(self);
         leftTrunk.setPlayer(left());
+        rightTrunk.setPlayer(right());
+        selfTrunk.setPlayer(self);
         trunk = makeTrunk(info.getPieces(), info.getActions());
-        dumbTrunks.put(self, selfTrunk);
         dumbTrunks.put(left(), leftTrunk);
+        dumbTrunks.put(right(), rightTrunk);
+        dumbTrunks.put(self, selfTrunk);
 
         if (turn == self) {
             this.clientState = ClientState.ACTIVE;
@@ -258,6 +269,9 @@ public class Client {
         int player = event.getPlayer();
         DumbTrunk dumbTrunk = dumbTrunk(player);
         if (dumbTrunk != null) {
+            if (player == right()) {
+                Gdx.app.log("right", "handle right event");
+            }
             dumbTrunk.perform(event.getAction());
         }
         if (player == self) {

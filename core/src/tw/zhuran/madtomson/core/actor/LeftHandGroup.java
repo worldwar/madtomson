@@ -7,9 +7,12 @@ import java.util.List;
 public class LeftHandGroup extends HandGroup {
     private BackGroup backGroup;
 
+    public LeftHandGroup(String name) {
+        this.backGroup = new BackGroup(name);
+    }
+
     @Override
     public void init(List<Piece> pieces, Piece wildcard) {
-        backGroup = new BackGroup("left-stand");
         backGroup.add(pieces.size());
         addActor(backGroup);
     }
